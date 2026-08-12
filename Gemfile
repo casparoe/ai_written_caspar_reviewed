@@ -2,7 +2,9 @@
 
 source "https://rubygems.org"
 
-gem "jekyll-theme-chirpy", "~> 7.5"
+# Pinned exactly: `_layouts/post.html` is overridden with a copy taken from this
+# version (for the `how_written` box). Keep both in sync when updating the theme.
+gem "jekyll-theme-chirpy", "7.6.0"
 
 gem "html-proofer", "~> 5.0", group: :test
 
