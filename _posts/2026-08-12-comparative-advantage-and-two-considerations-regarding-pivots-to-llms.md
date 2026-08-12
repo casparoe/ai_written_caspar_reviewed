@@ -4,7 +4,6 @@ description: >-
   Besides asking which LLM-related topics are closest to your existing
   expertise, ask which topics are far from everyone's existing expertise.
 date: 2026-08-12 00:00:00 +0000
-tags: [llms, research]
 how_written: >-
   I gave the main idea(s) and spent some time on iteration, even hand-edited a
   bunch. Thought about putting it on my blog, but then felt like it wasn't
