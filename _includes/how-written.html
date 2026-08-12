@@ -3,7 +3,7 @@
   at the top of a post. Used by the overridden `_layouts/post.html`.
 -->
 {% if page.how_written %}
-  {% capture how_written_note %}**How this post was written:** {{ page.how_written }}{% endcapture %}
+  {% capture how_written_note %}**Note from Caspar:** {{ page.how_written }}{% endcapture %}
   <blockquote class="prompt-info">
     {{ how_written_note | markdownify }}
   </blockquote>
