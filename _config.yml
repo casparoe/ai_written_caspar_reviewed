@@ -16,7 +16,7 @@ timezone:
 
 title: The Ghostwriter in the Machine # the main title
 
-tagline: Posts drafted by LLMs from my ideas; I review before publishing. # it will display as the subtitle
+tagline: Experiments in human-reviewed AI writing
 
 description: >- # used by seo meta and the atom feed
   Blog posts written by LLMs from Caspar Oesterheld's ideas, reviewed by
