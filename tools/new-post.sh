@@ -265,6 +265,7 @@ fi
 figs=0
 inline_n=0
 display_n=0
+pipes_n=0
 h1_stripped=0
 fig_files=""
 if [ "$body_mode" != "none" ]; then
@@ -276,13 +277,40 @@ if [ "$body_mode" != "none" ]; then
 
 function out(s) { print s; last_blank = (s == "") }
 
-# Convert inline math \( \) to $$; stray \[ \] on ordinary lines degrade to $$ too.
-function mathline(s,  n) {
+# Replace | with \vert by string surgery: BSD awk and gawk disagree on
+# backslash handling in gsub replacement text, so gsub cannot be used here.
+function escape_pipes(s,   out, p) {
+  out = ""
+  while ((p = index(s, "|")) > 0) {
+    out = out substr(s, 1, p - 1) "\\vert "
+    s = substr(s, p + 1)
+    nvert++
+  }
+  return out s
+}
+
+# Convert inline math \( .. \) to $$ .. $$. Pipes inside the span become
+# \vert (the same LaTeX symbol): kramdown scans for tables at block level
+# before it parses math spans, so a raw | inside inline math on the first
+# line of a paragraph turns the whole paragraph into a table row.
+function mathline(s,   res, ipos, after, cpos, inner, n) {
+  res = ""
+  while ((ipos = index(s, "\\(")) > 0) {
+    after = substr(s, ipos + 2)
+    cpos = index(after, "\\)")
+    if (cpos == 0) break
+    inner = escape_pipes(substr(after, 1, cpos - 1))
+    res = res substr(s, 1, ipos - 1) "$$" inner "$$"
+    s = substr(after, cpos + 2)
+    in_open++; in_close++
+  }
+  # dangling delimiters (counted so the imbalance warning still fires)
   n = gsub(/\\\(/, "$$", s); in_open += n
   n = gsub(/\\\)/, "$$", s); in_close += n
   n = gsub(/\\\[/, "$$", s); stray += n
   n = gsub(/\\\]/, "$$", s); stray += n
-  return s
+  n = gsub(/\|/, "|", s); rawpipe += n
+  return res s
 }
 
 function close_display() {
@@ -414,8 +442,10 @@ END {
     print "fig " i " " (figw[i] == "" ? "-" : figw[i]) " " (figh[i] == "" ? "-" : figh[i]) " " (figcap[i] ? 1 : 0) > sfile
   print "inline " (in_open + 0) > sfile
   print "display " (ndisp + 0) > sfile
+  print "pipes " (nvert + 0) > sfile
   if (in_open != in_close) print "warn inline-math-imbalance opens=" in_open " closes=" in_close > sfile
   if (stray) print "warn stray-display-delimiters " (stray + 0) > sfile
+  if (rawpipe) print "warn pipes-outside-math " (rawpipe + 0) " (kramdown may render those paragraphs as tables)" > sfile
   close(sfile)
 }
 AWK_EOF
@@ -443,7 +473,8 @@ AWK_EOF
       ;;
     inline) inline_n=$a ;;
     display) display_n=$a ;;
-    warn) echo "  ! check the draft: $a $b $c" ;;
+    pipes) pipes_n=$a ;;
+    warn) echo "  ! check the draft: $a $b $c $d" ;;
     esac
   done <"$tmpdir/stats"
   if [ "$h1_stripped" = "1" ]; then
@@ -451,6 +482,9 @@ AWK_EOF
   fi
   printf '  - math delimiters converted for kramdown: %s inline \\(..\\), %s display blocks\n' \
     "$inline_n" "$display_n"
+  if [ "$pipes_n" -gt 0 ]; then
+    printf '  - %s pipes inside inline math escaped as \\vert (kramdown table guard)\n' "$pipes_n"
+  fi
 
   i=1
   while [ "$i" -le "$figs" ]; do
