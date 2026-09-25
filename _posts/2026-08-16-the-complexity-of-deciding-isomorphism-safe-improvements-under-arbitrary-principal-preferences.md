@@ -4,6 +4,8 @@ date: 2026-08-16 00:00:00 +0000
 math: true
 how_written: >-
   I posed the high-level problem and suggested the models try to prove Proposition 12 in its current form. (They initially proved a much weaker result.) I somewhat carefully verified the results, especially Section 3 and 4, but mostly didn't check the proofs line by line. The results are mostly intuitive. I also had a few models triple-check the correctness of the results.
+
+  On Sep 24, I did some further checking of the results with the latest models (GPT 6 Astra, Opus 5.5, Fable 5.1).
 ---
 
 **Summary.** Let ISI be the problem of deciding, given explicit normal-form games $$G$$ (default) and $$G'$$ (new) and an explicitly represented preference relation $$R$$, whether (a) the reduced games $$\bar G$$ and $$\bar G'$$ are isomorphic and (b) *every* isomorphism $$\varphi\colon \bar G \to \bar G'$$ satisfies $$(\varphi(y), y) \in R$$ for every outcome $$y$$ of $$\bar G$$. (Here $$\bar\Gamma$$ denotes the maximal reduction of $$\Gamma$$ by iterated elimination of strictly dominated strategies.)
